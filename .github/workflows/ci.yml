@@ -16,26 +16,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Enable corepack
-        run: corepack enable
 
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: pnpm
+          cache: npm
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: npm ci
 
       - name: Format
-        run: pnpm format:check
+        run: npm run format:check
 
       - name: Svelte check
-        run: pnpm check
+        run: npm run check
 
       - name: Build
-        run: pnpm build
+        run: npm run build
         env:
           SEPAY_WEBHOOK_API_KEY: ci-placeholder
           SEPAY_ACCOUNT_NUMBER: '0010000000000'

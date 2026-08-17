@@ -6,7 +6,7 @@ User-fixed stack. Research confirms feasibility.
 
 - **SvelteKit** (latest stable, 2.x) running on **Svelte 5** (runes available — `$state`, `$derived`, `$effect`).
 - **JavaScript** (not TypeScript). Use **JSDoc** for type hints where it pays for itself (Redis client, SePay payload shapes). `jsconfig.json` for editor IntelliSense + `checkJs: false` to stay loose.
-- **Package manager: pnpm** (`pnpm-lock.yaml` committed, `packageManager` field in `package.json`, `.npmrc` with `shamefully-hoist=false`).
+- **Package manager: npm** (`package-lock.json` committed).
 - **Node.js runtime** for all server routes (incl. webhook). No edge runtime — keeps things uniform and avoids Upstash REST cold-path edge cases.
 
 ## UI
@@ -74,8 +74,8 @@ sepay-playground/
 ├── jsconfig.json
 ├── .npmrc
 ├── .env.example
-├── package.json                   # packageManager: pnpm@...
-└── pnpm-lock.yaml
+├── package.json
+└── package-lock.json
 ```
 
 ## Env Vars
@@ -103,7 +103,7 @@ All loaded via SvelteKit's `$env/static/private` (server-only — never leaks to
 
 - SvelteKit replaces Next.js — Vercel still primary deploy target via official adapter.
 - JavaScript replaces TypeScript — JSDoc typedefs cover the boundaries (Redis values, webhook payload).
-- pnpm replaces npm — lockfile committed, `packageManager` field set.
+- npm — lockfile committed.
 - shadcn-svelte replaces shadcn/ui — same design system, Svelte port.
 - Everything else (Upstash, SePay endpoints, env vars, ngrok-for-dev) unchanged.
 

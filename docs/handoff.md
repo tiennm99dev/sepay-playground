@@ -7,7 +7,7 @@
 ### Stack (see `docs/tech-stack.md`)
 
 - SvelteKit 2 + Svelte 5 (runes) + **JavaScript** (JSDoc for typedefs)
-- **pnpm** (lockfile committed; `packageManager` field)
+- **npm** (lockfile committed)
 - Tailwind v4 + **shadcn-svelte** (button, input, label, card, badge, alert) + `lucide-svelte` + `mode-watcher`
 - `@upstash/redis` via `Redis.fromEnv()`
 - `@sveltejs/adapter-vercel`
@@ -34,7 +34,7 @@
 1. **Re-ask design gate** (was deferred, not approved).
 2. **Run `/ck:plan --auto`** with full requirements — see `docs/tech-stack.md` + design guidelines as inputs. Plan dir → `./plans/<name>/`.
 3. **Run `/ck:cook --auto <plan-path>`** to scaffold + implement.
-4. **Onboarding**: walk user through env vars (`.env.example` → `.env.local`), `pnpm install`, `pnpm dev`, ngrok setup, SePay dashboard webhook URL config, `vercel deploy`.
+4. **Onboarding**: walk user through env vars (`.env.example` → `.env.local`), `npm install`, `npm run dev`, ngrok setup, SePay dashboard webhook URL config, `vercel deploy`.
 5. **Final report** + commit gate.
 6. **Run `/ck:journal`** for the session record.
 

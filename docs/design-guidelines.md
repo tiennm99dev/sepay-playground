@@ -68,7 +68,7 @@ All foreground/background pairs meet WCAG AA (≥4.5:1 for body, ≥3:1 for larg
 
 ## shadcn-svelte Mapping
 
-Components installed via `pnpm dlx shadcn-svelte@latest add <name>`. Files land in `src/lib/components/ui/<name>/`.
+Components installed via `npx shadcn-svelte@latest add <name>`. Files land in `src/lib/components/ui/<name>/`.
 
 | Pattern                   | shadcn-svelte component                                               |
 | ------------------------- | --------------------------------------------------------------------- |

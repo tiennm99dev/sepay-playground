@@ -7,7 +7,7 @@ A minimal developer playground for the **SePay VietQR** flow:
 3. Customer scans + transfers → bank → SePay → webhook hits `/api/webhooks/sepay`.
 4. Order flips to `paid`, UI updates.
 
-Built with **SvelteKit 2** (Svelte 5 runes) + **JavaScript** + **pnpm** + **Tailwind v4** + **Upstash Redis** + **adapter-vercel** (Node runtime).
+Built with **SvelteKit 2** (Svelte 5 runes) + **JavaScript** + **npm** + **Tailwind v4** + **Upstash Redis** + **adapter-vercel** (Node runtime).
 
 > Demo only. No real settlement, no auth, no users.
 
@@ -39,10 +39,10 @@ src/
 ## Setup
 
 ```sh
-pnpm install
+npm install
 cp .env.example .env.local
 # fill in real values — see below
-pnpm dev
+npm run dev
 ```
 
 ### Env vars
@@ -88,9 +88,9 @@ curl -X POST http://localhost:5173/api/dev/simulate-webhook \
 ## Deploy
 
 ```sh
-pnpm dlx vercel
-pnpm dlx vercel env add SEPAY_WEBHOOK_API_KEY     # repeat per var × per env
-pnpm dlx vercel deploy --prod
+npx vercel
+npx vercel env add SEPAY_WEBHOOK_API_KEY     # repeat per var × per env
+npx vercel deploy --prod
 ```
 
 `adapter-vercel` is wired to `runtime: 'nodejs20.x'` in `svelte.config.js` — webhook stays off the edge so `node:crypto` works.
