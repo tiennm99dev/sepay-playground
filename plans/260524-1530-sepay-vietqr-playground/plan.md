@@ -13,9 +13,11 @@ created: 2026-05-24
 
 Stack is locked per `docs/tech-stack.md`. This plan orders scaffolding → infra → routes → UI → dev tools → polish. Each phase is independently revertible. Total LOC budget ~600 lines.
 
+> **Package manager: npm.** The repo ships `package-lock.json`, an `.npmrc` with `engine-strict=true`, and npm-only CI. The commands below were originally written against pnpm and have been rewritten to their npm equivalents — follow them as written and do not reintroduce pnpm, bun, or yarn.
+
 ## Tooling compat notes (verified 2026-05)
 
-- `create-svelte` is deprecated; use the unified **`sv` CLI** (`pnpm dlx sv create`). Add-ons go via `--add`; JS via `--no-types`; package manager via `--install pnpm`.
+- `create-svelte` is deprecated; use the unified **`sv` CLI** (`npx sv create`). Add-ons go via `--add`; JS via `--no-types`; package manager via `--install npm`.
 - `shadcn-svelte@latest` CLI initializes projects with Tailwind v4 + Svelte 5 by default. Run `shadcn-svelte init` AFTER `sv create` because it expects an existing Tailwind v4 setup (Vite plugin, `@import "tailwindcss"` in `app.css`).
 - Tailwind v4 uses the **`@tailwindcss/vite`** plugin (not PostCSS) and removes `tailwind.config.js` in favor of CSS-first `@theme` blocks. Do NOT create `tailwind.config.js` or `postcss.config.js`.
 - shadcn-svelte under Svelte 5: `Card.Root`/`Card.Header` are namespaced exports. `mode-watcher` v0.5+ ships Svelte 5 runes-ready.
@@ -28,15 +30,14 @@ Stack is locked per `docs/tech-stack.md`. This plan orders scaffolding → infra
 
 ```bash
 # from repo root (sepay-playground/)
-pnpm dlx sv@latest create . --no-types --template minimal --add tailwindcss --add prettier --install pnpm
-pnpm add -D @sveltejs/adapter-vercel@^5
-pnpm remove @sveltejs/adapter-auto
+npx sv@latest create . --no-types --template minimal --add tailwindcss --add prettier --install npm
+npm i -D @sveltejs/adapter-vercel@^5
+npm rm @sveltejs/adapter-auto
 ```
 
 - Choose **minimal** template (no demo routes).
-- Edit `package.json` → add `"packageManager": "pnpm@9.x"`.
-- Add `.npmrc` with `shamefully-hoist=false` and `engine-strict=true`.
-- Smoke: `pnpm dev` should serve on :5173 with a blank page.
+- Add `.npmrc` with `engine-strict=true`.
+- Smoke: `npm run dev` should serve on :5173 with a blank page.
 
 ## Phase 2 — Configure adapter, runtime, env (goal: build target locked)
 
@@ -49,9 +50,9 @@ pnpm remove @sveltejs/adapter-auto
 ## Phase 3 — Tailwind v4 tokens + fonts + shadcn-svelte init (goal: design tokens addressable)
 
 ```bash
-pnpm dlx shadcn-svelte@latest init  # base-color: neutral, style: default, css: src/app.css
-pnpm dlx shadcn-svelte@latest add button input label card badge alert skeleton sonner alert-dialog
-pnpm add mode-watcher lucide-svelte
+npx shadcn-svelte@latest init  # base-color: neutral, style: default, css: src/app.css
+npx shadcn-svelte@latest add button input label card badge alert skeleton sonner alert-dialog
+npm i mode-watcher lucide-svelte
 ```
 
 - Edit `src/app.css`: keep `@import "tailwindcss";` then append a `@theme` block mapping tokens from `design-guidelines.md`:
@@ -73,7 +74,7 @@ pnpm add mode-watcher lucide-svelte
   - `buildQrUrl({ amount, code })` → returns `https://qr.sepay.vn/img?acc=...&bank=...&amount=...&des=...&template=compact` using `$env/static/private`.
   - `verifyWebhookAuth(request)` → checks `Authorization === 'Apikey ' + SEPAY_WEBHOOK_API_KEY`; returns boolean.
   - `extractOrderCode(payload)` → prefer `payload.code`; fallback regex `new RegExp(prefix + '([A-Z0-9]{6})')` on `payload.content`.
-- `pnpm add @upstash/redis nanoid`.
+- `npm i @upstash/redis nanoid`.
 
 ## Phase 5 — API routes (goal: order + webhook endpoints functional)
 
@@ -115,10 +116,10 @@ pnpm add mode-watcher lucide-svelte
 
 ## Phase 8 — Verification + docs (goal: handoff-ready)
 
-- `README.md` (new): env setup (`cp .env.example .env.local`), `pnpm install`, `pnpm dev`, ngrok command, SePay dashboard webhook URL config, `vercel deploy`.
+- `README.md` (new): env setup (`cp .env.example .env.local`), `npm install`, `npm run dev`, ngrok command, SePay dashboard webhook URL config, `vercel deploy`.
 - `.gitignore`: ensure `.env.local`, `.vercel`, `.svelte-kit`, `node_modules` covered (sv-create defaults usually suffice).
-- Run `pnpm build` end-to-end; ensure adapter-vercel produces `.vercel/output/`.
-- Run `pnpm svelte-check` skipped (JS-only project; `pnpm lint` + `pnpm format` instead).
+- Run `npm run build` end-to-end; ensure adapter-vercel produces `.vercel/output/`.
+- Run `npx svelte-check` skipped (JS-only project; `npm run lint` + `npm run format` instead).
 
 ---
 
@@ -130,7 +131,7 @@ pnpm add mode-watcher lucide-svelte
 | Webhook dedup race (two retries arrive within ms)     | L          | H      | `set nx` is atomic in Redis — only first call returns OK                                             |
 | SePay sends `code: null` (auto-extract misconfigured) | M          | M      | Fallback regex on `content`; log + return 200 (no retry storm)                                       |
 | Polling never stops if user leaves tab                | L          | L      | `$effect` cleanup on unmount; also stop after 15-min expiry                                          |
-| Dev simulator reachable in prod                       | L          | H      | Guard `import.meta.env.PROD` at top of handler; also smoke-test against `pnpm build && pnpm preview` |
+| Dev simulator reachable in prod                       | L          | H      | Guard `import.meta.env.PROD` at top of handler; also smoke-test against `npm run build && npm run preview` |
 | Tailwind v4 `@theme` syntax drift                     | L          | M      | Pin `tailwindcss@^4.0` in package.json; doc inline `@theme` reference                                |
 
 ## Rollback per phase
@@ -141,7 +142,7 @@ Each phase = one commit. `git revert <hash>` undoes it without cascade because: 
 
 | Phase | Files exclusively owned                                                                                             |
 | ----- | ------------------------------------------------------------------------------------------------------------------- |
-| 1     | `package.json`, `pnpm-lock.yaml`, `.npmrc`, `svelte.config.js` (initial), `vite.config.js`                          |
+| 1     | `package.json`, `package-lock.json`, `.npmrc`, `svelte.config.js` (initial), `vite.config.js`                          |
 | 2     | `svelte.config.js` (final), `.env.example`, `jsconfig.json`, `src/lib/types.js`                                     |
 | 3     | `src/app.css`, `src/app.html`, `src/lib/components/ui/**`, `src/routes/+layout.svelte` (initial)                    |
 | 4     | `src/lib/server/{redis,orders,sepay}.js`                                                                            |
@@ -154,7 +155,7 @@ Each phase = one commit. `git revert <hash>` undoes it without cascade because: 
 
 | #   | Scenario                  | Steps                                                                | Expected                                                                                |
 | --- | ------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| 1   | Landing renders           | `pnpm dev` → open `/`                                                | Header + intro + "Open /pay" button                                                     |
+| 1   | Landing renders           | `npm run dev` → open `/`                                                | Header + intro + "Open /pay" button                                                     |
 | 2   | Form validation           | `/pay`, submit empty/0/non-numeric                                   | Inline error, no redirect                                                               |
 | 3   | Order creation            | `/pay`, amount 10000, submit                                         | Redirects to `/pay?code=SE...`, shows awaiting state, QR image loads from `qr.sepay.vn` |
 | 4   | Redis state               | `redis-cli` (or Upstash console) `GET order:<code>`                  | JSON with `status:"pending"`                                                            |
@@ -164,7 +165,7 @@ Each phase = one commit. `git revert <hash>` undoes it without cascade because: 
 | 8   | Webhook dedup             | Replay same payload (same `id`) twice                                | Both return 200; order updated once                                                     |
 | 9   | Webhook unmatched         | Send payload with `code:null`, content with no prefix match          | 200 `{unmatched:true}`; no order touched                                                |
 | 10  | Outgoing transfer ignored | `transferType:"out"` payload                                         | 200; no order touched                                                                   |
-| 11  | Prod guard                | `pnpm build && pnpm preview`, hit `/api/dev/simulate-webhook`        | 404                                                                                     |
+| 11  | Prod guard                | `npm run build && npm run preview`, hit `/api/dev/simulate-webhook`        | 404                                                                                     |
 | 12  | Dark mode                 | Toggle via mode-watcher / OS                                         | Tokens swap; contrast preserved                                                         |
 | 13  | Reduced motion            | OS setting → reduce                                                  | No fade transitions on state swap                                                       |
 | 14  | Real webhook (ngrok)      | `ngrok http 5173`, set SePay dashboard URL, do 10k VND test transfer | Awaiting → paid in <5s                                                                  |
@@ -181,20 +182,20 @@ Each phase = one commit. `git revert <hash>` undoes it without cascade because: 
 
 ```bash
 # Phase 1
-pnpm dlx sv@latest create . --no-types --template minimal --add tailwindcss --add prettier --install pnpm
-pnpm add -D @sveltejs/adapter-vercel@^5
-pnpm remove @sveltejs/adapter-auto
+npx sv@latest create . --no-types --template minimal --add tailwindcss --add prettier --install npm
+npm i -D @sveltejs/adapter-vercel@^5
+npm rm @sveltejs/adapter-auto
 
 # Phase 3
-pnpm dlx shadcn-svelte@latest init
-pnpm dlx shadcn-svelte@latest add button input label card badge alert skeleton sonner alert-dialog
-pnpm add mode-watcher lucide-svelte
+npx shadcn-svelte@latest init
+npx shadcn-svelte@latest add button input label card badge alert skeleton sonner alert-dialog
+npm i mode-watcher lucide-svelte
 
 # Phase 4
-pnpm add @upstash/redis nanoid
+npm i @upstash/redis nanoid
 
 # Phase 8
-pnpm build && pnpm preview
+npm run build && npm run preview
 ```
 
 Sources verified during planning:
