@@ -1,6 +1,5 @@
-import { json } from '@sveltejs/kit';
-import { claimWebhookId, markPaid, getOrder } from '$lib/server/orders.js';
-import { verifyWebhookAuth, extractOrderCode } from '$lib/server/sepay.js';
+import { claimWebhookId, markPaid, getOrder } from '#lib/server/orders.js';
+import { verifyWebhookAuth, extractOrderCode } from '#lib/server/sepay.js';
 
 /**
  * SePay POSTs here. Spec:
@@ -10,36 +9,36 @@ import { verifyWebhookAuth, extractOrderCode } from '$lib/server/sepay.js';
  */
 export async function POST({ request }) {
 	if (!verifyWebhookAuth(request)) {
-		return json({ success: false, error: 'unauthorized' }, { status: 401 });
+		return Response.json({ success: false, error: 'unauthorized' }, { status: 401 });
 	}
 
-	/** @type {import('$lib/types.js').SepayWebhookPayload} */
+	/** @type {import('#lib/types.js').SepayWebhookPayload} */
 	let payload;
 	try {
 		payload = await request.json();
 	} catch {
-		return json({ success: false, error: 'invalid json' }, { status: 400 });
+		return Response.json({ success: false, error: 'invalid json' }, { status: 400 });
 	}
 
 	if (payload.transferType !== 'in') {
-		return json({ success: true, ignored: 'outgoing' });
+		return Response.json({ success: true, ignored: 'outgoing' });
 	}
 
 	const fresh = await claimWebhookId(payload.id);
 	if (!fresh) {
-		return json({ success: true, deduped: true });
+		return Response.json({ success: true, deduped: true });
 	}
 
 	const code = extractOrderCode(payload);
 	if (!code) {
 		console.warn('[sepay] unmatched webhook', { id: payload.id, content: payload.content });
-		return json({ success: true, unmatched: true });
+		return Response.json({ success: true, unmatched: true });
 	}
 
 	const existing = await getOrder(code);
 	if (!existing) {
 		console.warn('[sepay] webhook for missing/expired order', { id: payload.id, code });
-		return json({ success: true, orphan: true });
+		return Response.json({ success: true, orphan: true });
 	}
 
 	const updated = await markPaid(code, {
@@ -47,5 +46,5 @@ export async function POST({ request }) {
 		txReference: payload.referenceCode
 	});
 
-	return json({ success: true, code, status: updated?.status });
+	return Response.json({ success: true, code, status: updated?.status });
 }

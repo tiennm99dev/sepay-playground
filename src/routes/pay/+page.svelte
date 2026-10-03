@@ -1,8 +1,8 @@
 <script>
 	import { fade } from 'svelte/transition';
-	import PayForm from '$lib/components/PayForm.svelte';
-	import PayAwaiting from '$lib/components/PayAwaiting.svelte';
-	import PayPaid from '$lib/components/PayPaid.svelte';
+	import PayForm from '#lib/components/PayForm.svelte';
+	import PayAwaiting from '#lib/components/PayAwaiting.svelte';
+	import PayPaid from '#lib/components/PayPaid.svelte';
 
 	let { data, form } = $props();
 

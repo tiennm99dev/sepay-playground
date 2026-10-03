@@ -4,7 +4,7 @@ import {
 	SEPAY_BANK_CODE,
 	SEPAY_ORDER_PREFIX,
 	SEPAY_WEBHOOK_API_KEY
-} from '$env/static/private';
+} from '$app/env/private';
 
 const PREFIX = (SEPAY_ORDER_PREFIX || 'SEVQR').toUpperCase();
 
@@ -47,7 +47,7 @@ export function verifyWebhookAuth(request) {
  * Prefer the dashboard-extracted `code` field; fall back to scanning `content`
  * for "<PREFIX><6 alphanum>". Returns null when nothing usable matches.
  *
- * @param {import('$lib/types.js').SepayWebhookPayload} payload
+ * @param {import('#lib/types.js').SepayWebhookPayload} payload
  * @returns {string | null}
  */
 export function extractOrderCode(payload) {

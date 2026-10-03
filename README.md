@@ -93,7 +93,7 @@ npx vercel env add SEPAY_WEBHOOK_API_KEY     # repeat per var × per env
 npx vercel deploy --prod
 ```
 
-`adapter-vercel` is wired to `runtime: 'nodejs20.x'` in `svelte.config.js` — webhook stays off the edge so `node:crypto` works.
+`adapter-vercel` is wired to `runtime: 'nodejs24.x'` in `vite.config.js` — webhook stays off the edge so `node:crypto` works.
 
 > Vercel **preview** deployments are publicly reachable and `dev === false` there, so the simulate-webhook endpoint returns 404. Real webhooks still work on previews if you point a SePay env at the preview URL.
 

@@ -1,6 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { createOrder, getOrder } from '$lib/server/orders.js';
-import { buildQrUrl } from '$lib/server/sepay.js';
+import { createOrder, getOrder } from '#lib/server/orders.js';
+import { buildQrUrl } from '#lib/server/sepay.js';
 
 /**
  * Always re-read from Redis so the awaiting page can't render a stale

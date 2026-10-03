@@ -1,5 +1,5 @@
 <script>
-	import { invalidateAll } from '$app/navigation';
+	import { refreshAll } from '$app/navigation';
 	import { onMount } from 'svelte';
 
 	let { order, qrUrl } = $props();
@@ -32,7 +32,7 @@
 				const fresh = await res.json();
 				if (fresh.status === 'paid') {
 					// triggers `load` rerun → view flips to 'paid'
-					await invalidateAll();
+					await refreshAll();
 				}
 			} catch (err) {
 				if (err.name !== 'AbortError') console.warn('[poll]', err);

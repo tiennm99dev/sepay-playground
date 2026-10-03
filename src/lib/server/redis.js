@@ -1,5 +1,11 @@
 import { Redis } from '@upstash/redis';
-import { env } from '$env/dynamic/private';
+import {
+	UPSTASH_REDIS_REST_URL,
+	KV_REST_API_URL,
+	UPSTASH_REDIS_REST_TOKEN,
+	KV_REST_API_TOKEN,
+	KEY_PREFIX
+} from '$app/env/private';
 
 // Upstash Redis handle factory.
 //
@@ -28,12 +34,12 @@ let handle = /** @type {RedisHandle | null} */ (null);
  */
 export function getRedis() {
 	if (handle) return handle;
-	const url = env.UPSTASH_REDIS_REST_URL ?? env.KV_REST_API_URL;
-	const token = env.UPSTASH_REDIS_REST_TOKEN ?? env.KV_REST_API_TOKEN;
+	const url = UPSTASH_REDIS_REST_URL ?? KV_REST_API_URL;
+	const token = UPSTASH_REDIS_REST_TOKEN ?? KV_REST_API_TOKEN;
 	if (!url) throw new Error('UPSTASH_REDIS_REST_URL or KV_REST_API_URL is required');
 	if (!token) throw new Error('UPSTASH_REDIS_REST_TOKEN or KV_REST_API_TOKEN is required');
 	const client = new Redis({ url, token });
-	const prefix = env.KEY_PREFIX ?? DEFAULT_KEY_PREFIX;
+	const prefix = KEY_PREFIX ?? DEFAULT_KEY_PREFIX;
 	handle = { client, prefix };
 	return handle;
 }

@@ -35,7 +35,7 @@ User-fixed stack. Research confirms feasibility.
 
 ## Deployment
 
-- **Vercel** via **`@sveltejs/adapter-vercel`** (auto-detected by Vercel when present in `svelte.config.js`).
+- **Vercel** via **`@sveltejs/adapter-vercel`** (auto-detected by Vercel when configured in the `sveltekit()` plugin in `vite.config.js`).
 - No `vercel.json` needed.
 - Env vars: `vercel env add ...` per-environment, `vercel env pull .env.local` for dev.
 - Local public URL for SePay during dev: **ngrok** (`ngrok http 5173` — SvelteKit's default dev port).
@@ -47,6 +47,7 @@ sepay-playground/
 ├── src/
 │   ├── app.css                    # Tailwind import + tokens
 │   ├── app.html
+│   ├── env.js                     # declares env vars for $app/env/private
 │   ├── lib/
 │   │   ├── server/
 │   │   │   ├── redis.js           # Redis.fromEnv() client
@@ -68,8 +69,7 @@ sepay-playground/
 │           ├── webhooks/sepay/+server.js  # POST receiver
 │           └── dev/simulate-webhook/+server.js  # gated by !PROD
 ├── static/
-├── svelte.config.js               # adapter-vercel
-├── vite.config.js
+├── vite.config.js                 # sveltekit() plugin + adapter-vercel
 ├── tailwind.config.js (or v4 inline) + postcss.config.js
 ├── jsconfig.json
 ├── .npmrc

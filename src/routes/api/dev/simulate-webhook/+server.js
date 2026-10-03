@@ -1,7 +1,7 @@
-import { json, error } from '@sveltejs/kit';
-import { dev } from '$app/environment';
-import { SEPAY_WEBHOOK_API_KEY, DEV_SIMULATE_TOKEN } from '$env/static/private';
-import { getOrder } from '$lib/server/orders.js';
+import { error } from '@sveltejs/kit';
+import { dev } from '$app/env';
+import { SEPAY_WEBHOOK_API_KEY, DEV_SIMULATE_TOKEN } from '$app/env/private';
+import { getOrder } from '#lib/server/orders.js';
 
 /**
  * Dev-only helper: builds a SePay-shaped payload and re-POSTs it to the real
@@ -30,7 +30,7 @@ export async function POST({ request, fetch }) {
 
 	const amount = body.amount ?? order.amount;
 
-	/** @type {import('$lib/types.js').SepayWebhookPayload} */
+	/** @type {import('#lib/types.js').SepayWebhookPayload} */
 	const payload = {
 		id: Date.now(),
 		gateway: 'Vietcombank',
@@ -56,7 +56,7 @@ export async function POST({ request, fetch }) {
 		body: JSON.stringify(payload)
 	});
 	const upstream = await res.json();
-	return json({ simulated: payload, upstream, status: res.status });
+	return Response.json({ simulated: payload, upstream, status: res.status });
 }
 
 function shortRef() {

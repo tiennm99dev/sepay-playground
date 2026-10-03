@@ -1,6 +1,6 @@
 import { customAlphabet } from 'nanoid';
 import { getRedis, pkey } from './redis.js';
-import { SEPAY_ORDER_PREFIX } from '$env/static/private';
+import { SEPAY_ORDER_PREFIX } from '$app/env/private';
 
 const ORDER_TTL_SECONDS = 60 * 60 * 24; // 24h — demo only
 const ORDER_KEY = (/** @type {string} */ code) => `order:${code}`;
@@ -14,7 +14,7 @@ const PREFIX = (SEPAY_ORDER_PREFIX || 'SEVQR').toUpperCase();
 
 /**
  * @param {{ amount: number }} input
- * @returns {Promise<import('$lib/types.js').Order>}
+ * @returns {Promise<import('#lib/types.js').Order>}
  */
 export async function createOrder({ amount }) {
 	if (!Number.isInteger(amount) || amount < 1000 || amount > 50_000_000) {
@@ -25,7 +25,7 @@ export async function createOrder({ amount }) {
 	// Retry on collision (NX returns null on existing key).
 	for (let attempt = 0; attempt < 3; attempt++) {
 		const code = `${PREFIX}${codeBody()}`;
-		/** @type {import('$lib/types.js').Order} */
+		/** @type {import('#lib/types.js').Order} */
 		const order = {
 			code,
 			amount,
@@ -43,7 +43,7 @@ export async function createOrder({ amount }) {
 
 /**
  * @param {string} code
- * @returns {Promise<import('$lib/types.js').Order | null>}
+ * @returns {Promise<import('#lib/types.js').Order | null>}
  */
 export async function getOrder(code) {
 	const h = getRedis();
@@ -56,7 +56,7 @@ export async function getOrder(code) {
  *
  * @param {string} code
  * @param {{ paidAt: string, txReference: string }} meta
- * @returns {Promise<import('$lib/types.js').Order | null>}
+ * @returns {Promise<import('#lib/types.js').Order | null>}
  */
 export async function markPaid(code, { paidAt, txReference }) {
 	const current = await getOrder(code);
